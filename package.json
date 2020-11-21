@@ -1,0 +1,22 @@
+{
+  "name": "paypal_dapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jassan888/Paypal_Dapp.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jassan888/Paypal_Dapp/issues"
+  },
+  "homepage": "https://github.com/Jassan888/Paypal_Dapp#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
