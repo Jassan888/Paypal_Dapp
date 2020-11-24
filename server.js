@@ -2,9 +2,20 @@ const express= require('express');
 
 const app= express();
 
+const bodyParser= require('body-parser');
+
+app.use(bodyParser.json());
+
 app.post('/',(req,res)=>{
     var email= req.body.email;
     var amount= res.bode.amount;
+
+    if(amount<= 1){
+        return_info= {};
+        return_info.error= true;
+        return_info.message= "Amount should be greater than 1";
+        return_req.send(return_info);
+    }
 
     res.send({"amount" :amount, "email" :email});
 });
