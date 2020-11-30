@@ -13,7 +13,7 @@ const publicPath= path.join(__dirname, './public');
 app.use(bodyParser.json());
 app.use(express.static(pathPath));
 
-app.post('/',async(req,res)=>{
+app.post('/post_info',async(req,res)=>{
     var email= req.body.email;
     var amount= res.bode.amount;
 

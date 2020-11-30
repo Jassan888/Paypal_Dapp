@@ -8,6 +8,13 @@ class App extends React.Component{
             'email': ''
         }
     }
+    onSubmit= async(event)=>{
+        event.PreventDefault();
+        const response= await axios.post('/post_info',{
+            amount: this.state.amount,
+            email: this.state.email
+        })
+    }
     render(){
         return(
             <div>
@@ -15,11 +22,12 @@ class App extends React.Component{
                 <div>
                     <p>Total lottery amount is {this.state.total_amount} </p>
                 </div>
-                <form>
+                <form onSubmit={this.onSubmit}>
                     <input placeHolder= 'amount' value= {this.state.total_amount}
-                    onCghange= {event=> this.setState({amount: event.traget.value})}/>
-                    <input placeHolder= 'email'value= {this.state.email}/>
-                    <button>Participate </button>
+                    onChange= {event=> this.setState({amount: event.target.value})}/>
+                    <input placeHolder= 'email'value= {this.state.email}
+                    onChange= {event=> this.setState({email: event.target.value})}/>
+                    <button type='submit'> Participate </button>
                 </form>
             </div>
         )
