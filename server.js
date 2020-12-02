@@ -79,7 +79,24 @@ app.post('/post_info',async(req,res)=>{
             }
         }
     });
+});
 
+app.get('/success', async(req, res)=>{
+    const payerId= req.query.payerID;
+    const paymentId= req.query.paymentID;
+    var execute_payment_json={
+        'payerId': payerId,
+        "transactions":[{
+           " amount":{
+               "currency": "USD",
+               "total": 100
+           }
+        }]
+    }
+
+    paypal.execute(paymentId, execute_payment_json, function payment(err){
+        
+    })
 
 });
 
