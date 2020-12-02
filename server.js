@@ -11,7 +11,15 @@ const path= require('path');
 const publicPath= path.join(__dirname, './public');
 
 const paypal= require('paypal-rest-sdk');
-const { getMaxListeners } = require('process');
+
+const sessions = require('express-sessions');
+
+app.use(session({
+    secret: 'my web application',
+    cookie: {maxAge: 60000}
+}
+));
+
 
 app.use(bodyParser.json());
 app.use(express.static(pathPath));
@@ -33,7 +41,9 @@ app.post('/post_info',async(req,res)=>{
         return_req.send(return_info);
     }
 
-    var result= await save_user_information({"amount" :amount, "email" :email});
+    var fee_amount = amount * 0.9;
+    var result= await save_user_information({"amount" :fee_amount, "email" :email});
+    req.session.paypal_amount= amount;
 
     var create_payment_json = {
         "intent": "sale",
@@ -92,12 +102,17 @@ app.get('/success', async(req, res)=>{
                "total": 100
            }
         }]
-    }
+    };
 
-    paypal.execute(paymentId, execute_payment_json, function payment(err){
-        
-    })
-
+    paypal.payment.execute(paymentId, execute_payment_json, function payment(err){
+        if(err){
+            console.log(error.response);
+            throw err;
+        }else{
+            console.log(payment);
+        }
+    });
+    res.redirect('http://localhost:3000');
 });
 
 app.get('./get_total_amount', async(req,res)=>{
