@@ -4,7 +4,7 @@ const app= express();
 
 const bodyParser= require('body-parser');
 
-const save_user_information= require('./models/server-db');
+const {save_user_information, get_list_of_participants,delete_users}= require('./models/server-db');
 
 const path= require('path');
 
@@ -99,7 +99,7 @@ app.get('/success', async(req, res)=>{
         "transactions":[{
            " amount":{
                "currency": "USD",
-               "total": 100
+               "total": req.session.paypal_amount
            }
         }]
     };
@@ -112,6 +112,11 @@ app.get('/success', async(req, res)=>{
             console.log(payment);
         }
     });
+
+    if(req.session.winner_picked){
+    var deleted= await delete_users();
+    }
+    req.session.winner_picked= false;
     res.redirect('http://localhost:3000');
 });
 
@@ -119,6 +124,94 @@ app.get('./get_total_amount', async(req,res)=>{
    var result= await get_total_amount();
    res.send(result);
 })
+
+app.get('/get_winner'), async(req,res)=>{
+    var result= await get_total_amount();
+    var total_amount= result[0].total_amount;
+    req.session.paypal_amount= total_amount;
+}
+
+var list_of_participants= await get_list_of_participants();
+list_of_participants= JSON.parse(JSON.stringify(list_of_participants));
+var email_array= [];
+list_of_participants.forEach(function(element){
+    email_array.push(element.email);
+});
+var winner_email= email_array[Math.floor(Math.random()*email_array.length)];
+req.session.winner_pciked= true;
+
+var create_payment_json = {
+    "intent": "sale",
+    "payer": {
+        "payment_method": "paypal"
+    },
+    "redirect_urls": {
+        "return_url": "http://localhost:3000/success",
+        "cancel_url": "http://localhost:3000/cancel"
+    },
+    "transactions": [{
+        "item_list": {
+            "items": [{
+                "name": "Lottery",
+                "sku": "Funding",
+                "price": req.session.paypal_amount,
+                "currency": "USD",
+                "quantity": 1
+            }]
+        },
+        "amount": {
+            "currency": "USD",
+            "total": "amount"
+        },
+        'payee':{
+            email:'jeffreyassan88@gmail.com'
+        },
+        "description": "Lottery Purchase"
+    }]
+};
+ var create_payment_json = {
+        "intent": "sale",
+        "payer": {
+            "payment_method": "paypal"
+        },
+        "redirect_urls": {
+            "return_url": "http://localhost:3000/success",
+            "cancel_url": "http://localhost:3000/cancel"
+        },
+        "transactions": [{
+            "item_list": {
+                "items": [{
+                    "name": "Lottery",
+                    "sku": "Funding",
+                    "price": "amount",
+                    "currency": "USD",
+                    "quantity": 1
+                }]
+            },
+            "amount": {
+                "currency": "USD",
+                "total": req.session.paypal_amount,
+            },
+            'payee':{
+                email:'winners email'
+            },
+            "description": "paying the winner of the lottery application"
+        }]
+    };
+    paypal.payment.create(create_payment_json, function (error, payment) {
+        if (error) {
+            throw error;
+        } else {
+            console.log("Create Payment Response");
+            console.log(payment);
+            for(var i= 0; i < payment.links.length; i++){
+                if(payment.links[1].rel == 'approval_url'){
+                    return res.redirect(payment.links[1].href);
+                }
+            }
+        }
+    });
+    
 
 app.listen(3000,()=>{
     console.log('server is running on port 3000');

@@ -29,6 +29,27 @@ get_total_amount= (dta) => new Promise((Resolve,Reject)=>{
     });
 })
 
+get_list_of_participants= (data)=> Promise((Resolve, Reject)=>{
+    db.query('select from lotteryinformation', null, function(err,results,fields){
+        if(err){
+            reject('could not fetch list from participants')
+        }
+        resolve(results);
+    });
+});
+
+delete_users=(data)=> new Promise((resolve,reject)=>{
+    db.query('delete from lottery_information where ID > 0',null,funtion(err,results,fields)>={
+        if(err){
+            reject("could not delete all users");
+            resolve("sucessfully deleted all users");
+        }
+    });
+});
+
 module.exports= {
-    save_user_information
+    save_user_information,
+    get_list_of_participants,
+    delete_user
+
 }
